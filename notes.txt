@@ -1,0 +1,69 @@
+pictures
+
+
+need a way to get all of the pictures sorted and attached to a specific date
+
+create an interface that shows all of the unsorted pictures (pictures that dont have an attached memory)
+
+i was thinking of a gui that shows all of the unsorted pictures and
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
++-------------------+           +---------------------------+
+|  Upload Pictures  |           |  Script through pictures  |_______________________
+|                   |           |                                                   |
+|   100546.png      |           |   loop through all pictures from upload folder    |
+|   100298.png      |           |   have form to fill out for each picture          |
+|   321465.png      |    ->     |   move picture into different folder              |
+|   198244.png      |           |   create entry in database for each picture       |
+|   561564.png      |           |   change name to picture id   (ex. '105.png')     |
+|   .               |           |                                                   |
+|   .               |           +---------------------------------------------------+
+|   .               |
++-------------------+ 
+                                                    ^
+                                                    |
+
+                                +-----------------+
+                                |  PictureMemory  |_________________
+                                |                                   |
+                                |   picture_id      int         0   |
+                                |   memory_id       int         1   |
+                                |   
+
+
+                                                    ^
+                                                    |
+
+                                +----------+
+                                |  Memory  |______________________________________
+                                |                                                 |
+                                |   memory_id       int         0                 |
+                                |   memory_note     string      "Today we ... "   |
+                                |   

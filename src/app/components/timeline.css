@@ -1,0 +1,38 @@
+.timeline {
+    position: relative;
+    height: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.timelineItem {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #3498db;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    cursor: pointer;
+    transition: all;
+}
+
+.timelineItem:hover {
+    width: 15px;
+    height: 15px;
+    transition: all;
+}
+
+.itemContent {
+    display: none;
+    position: absolute;
+    top: 40px;
+    background-color: #3498db;
+    padding: 10px;
+    border-radius: 5px;
+    color: #fff;
+    width: max-content;
+}
+
+.timelineItem:hover .itemContent {
+    display: block;
+}
