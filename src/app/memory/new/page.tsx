@@ -53,27 +53,29 @@ export default function NewMemoryPage() {
         });
     }
     
-    async function processExifData(imageFile: File) {
-        console.log('imageFile')
-        console.log(imageFile)
-        const dataURL = await readFileAsync(imageFile);
-        const date = exif.getData(dataURL, () => {
-            const dateOriginal = exif.getTag(imageFile, 'DateTimeOriginal');
-            const lastModifiedDate = new Date(imageFile.lastModified);
+    async function processExifData(imageFile: File): Promise<string> {
+        console.log('imageFile');
+        console.log(imageFile);
     
-            if (dateOriginal) {
-                console.log('Date from EXIF:', dateOriginal);
-                return(dateOriginal)
-            } else if (lastModifiedDate) {
-                console.log('Date from EXIF:', dateOriginal);
-                return(lastModifiedDate)
-            } else {
-                console.log('no date found from EXIF')
-                return("")
-            }
+        const dataURL = await readFileAsync(imageFile);
+    
+        return new Promise<string>((resolve, reject) => {
+            exif.getData(dataURL, () => {
+                const dateOriginal = exif.getTag(imageFile, 'DateTimeOriginal');
+                const lastModifiedDate = new Date(imageFile.lastModified);
+    
+                if (dateOriginal) {
+                    console.log('Date from EXIF:', dateOriginal);
+                    resolve(dateOriginal);
+                } else if (lastModifiedDate) {
+                    console.log('Date from lastModifiedDate:', lastModifiedDate.toISOString());
+                    resolve(lastModifiedDate.toISOString());
+                } else {
+                    console.log('No date found from EXIF');
+                    resolve("");
+                }
+            });
         });
-
-        if (date) setUploadedImageDate(date)
     }
 
     const AttachedImages = () => {
