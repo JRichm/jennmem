@@ -34,7 +34,7 @@ class Memory(db.Model):
 
 class Picture(db.Model):
     id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
-    note = db.Column(db.String(), nullable=False)
+    data = db.Column(db.String(), nullable=False)
     memory_id = db.Column(db.Integer, ForeignKey("memory.id"))
     memory = relationship("Memory", back_populates="pictures")
     created = db.Column(db.Date(), nullable=False)

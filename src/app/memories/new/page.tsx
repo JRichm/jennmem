@@ -1,6 +1,7 @@
 "use client"
 import * as exif from 'exif-js';
 import React, { useState } from 'react'
+import { redirect } from 'next/navigation'
 import Image from 'next/image'
 
 import MainHeader from "@/app/components/mainHeader";
@@ -63,12 +64,13 @@ export default function NewMemoryPage() {
         });
     }
 
-    function saveMemory(e: React.FormEvent<HTMLFormElement>) {
+    async function saveMemory(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
         console.log('saving memory')
 
+        // call api to add new memory to database
         try {
-            fetch('http://localhost:5000/new_memory', {
+            const memoryResponse = await fetch('http://localhost:5000/new_memory', {
                 method: "POST",
                 mode: "cors",
                 headers: {
@@ -76,7 +78,53 @@ export default function NewMemoryPage() {
                 },
                 // redirect: "follow",
                 body: JSON.stringify(formData)
-            }).then((data) => { console.log(data)})
+            })
+
+            console.log(memoryResponse)
+
+            if (!memoryResponse.ok) {
+                throw new Error("Network response was not ok")
+
+            }
+
+            const data = await memoryResponse.json();
+            console.log('Memory data:', data);
+
+            // Iterate over each uploaded image
+            for (const imageData of uploadedImages) {
+                try {
+                    // Convert the base64 image data to a Blob
+                    const blobData = await (await fetch(imageData)).blob();
+            
+                    // Create a FormData object to send the Blob to the server
+                    const formData = new FormData();
+                    formData.append('memoryId', data.memoryId);
+                    formData.append('imageData', blobData);
+            
+                    console.log("memoryid:");
+                    console.log(data);
+            
+                    // Now, send the FormData object to the server using a FormData-compatible request
+                    const pictureResponse = await fetch('http://localhost:5000/add_picture', {
+                        method: 'POST',
+                        body: formData,
+                    });
+            
+                    if (!pictureResponse.ok) {
+                        throw new Error('Failed to save picture');
+                    }
+            
+                    console.log('pictureResponse');
+                    console.log(pictureResponse);
+            
+                } catch (pictureError) {
+                    console.error('Error saving picture:', pictureError);
+                }
+            }
+
+            window.location.href = '/memories'
+        
+        // catch errors
         } catch (error) {
             console.error(error)
         }
@@ -93,14 +141,6 @@ export default function NewMemoryPage() {
         for (let i = 0; i < numRows * numCols; i++) {
             elements.push(
                 <div key={i} className='flex aspect-square'>
-                    {/* 
-                    
-                    
-                    { i < numImages ? () : () }
-                    
-                    
-                    */}
-
                     { i < numImages ? (
                         <div className='h-full w-full'>
                             <img src={uploadedImages[i]} alt={`uploaded-${i}`} className='h-full w-full object-cover' />
