@@ -4,6 +4,9 @@ from sqlalchemy.orm import relationship, mapped_column, Mapped
 from typing import List
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # from dotenv import load_dotenv
 # load_dotenv()
@@ -31,10 +34,16 @@ class Memory(db.Model):
 
 class Picture(db.Model):
     id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
-    note = db.Column(db.String(), nullable=False, unique=True)
+    note = db.Column(db.String(), nullable=False)
     memory_id = db.Column(db.Integer, ForeignKey("memory.id"))
     memory = relationship("Memory", back_populates="pictures")
     created = db.Column(db.Date(), nullable=False)
     updated = db.Column(db.Date(), nullable=False)
 
 
+def connect_to_db(app):
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI")
+    db.app = app
+    db.init_app(app)
+
+    print('connected to the db!')
