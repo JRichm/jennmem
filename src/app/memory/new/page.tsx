@@ -17,18 +17,6 @@ export default function NewMemoryPage() {
     const [uploadedImageDate, setUploadedImageDate] = useState("")      // suggested date when user uploads pictures with attached date
     const [formData, setFormData] = useState<formDataType>({memoryName: "", memoryDate: new Date(), memoryDetails: ""}) // form data / user input
 
-    // save images
-    function saveImages(event: React.FormEvent<HTMLFormElement>) {
-        event.preventDefault()
-        console.log('saving images')
-        console.log(uploadedImages)
-
-        uploadedImages.forEach(image => {
-            let imgData = getBase64Image(image)
-            localStorage.setItem("/images/imgDta", imgData)
-        })
-    }
-
     // handle user input 
     function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
 
@@ -58,37 +46,9 @@ export default function NewMemoryPage() {
             // get url from image
             const dataURL = await readFileAsync(imageFile);
 
-            // Assuming you have an API endpoint to handle file uploads
-            uploadImageToServer(imageFile)
-                .then((serverImagePath) => {
-                    // Save the server image path to localStorage
-                    localStorage.setItem("serverImagePath", serverImagePath);
-                })
-                .catch((error) => {
-                    console.error("Error uploading image:", error);
-                });
-        }
-
             // add url to list of all uploaded images
             setUploadedImages((prevImages) => [...prevImages, dataURL]);
         }
-    }
-
-    function uploadImageToServer(imageFile) {
-
-    }
-
-    function getBase64Image(img: HTMLImageElement) {
-        var canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-    
-        var ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-    
-        var dataURL = canvas.toDataURL("image/png");
-    
-        return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
     }
 
     async function readFileAsync(file: File): Promise<string> {
@@ -102,6 +62,10 @@ export default function NewMemoryPage() {
         });
     }
 
+    function saveImages() {
+        
+    }
+
     const AttachedImages = () => {
         const numImages = uploadedImages.length;
         const numCols = 4;
@@ -113,6 +77,14 @@ export default function NewMemoryPage() {
         for (let i = 0; i < numRows * numCols; i++) {
             elements.push(
                 <div key={i} className='flex aspect-square'>
+                    {/* 
+                    
+                    
+                    { i < numImages ? () : () }
+                    
+                    
+                    */}
+
                     { i < numImages ? (
                         <div className='h-full w-full'>
                             <img src={uploadedImages[i]} alt={`uploaded-${i}`} className='h-full w-full object-cover' />

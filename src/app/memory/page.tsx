@@ -1,30 +1,53 @@
-export default function AllMemoriesPage() {
+"use client"
 
-    interface MemoryElementProps {
-        title: string;
-        date: string;
-        pictures: string;
+import React, { useState, useEffect } from 'react'
+import MainHeader from "../components/mainHeader"
+
+
+export default function AllMemoriesPage() {
+    interface Memory {
+        name: string;
+        note: string;
+        date: Date;
+        created: Date;
+        updated: Date;
     }
 
-    const numMemories = 30;
-    let memoryElements = [];
+    interface MemoryList {
+        memories: Memory[]
+    }
+    
+    const [memories, setMemories] = useState<MemoryList>();
+    const [isLoading, setLoading] = useState(true);
 
-    const MemoryElement = ({title, date, pictures}: MemoryElementProps) => {
+    // fetch memories
+    useEffect(() => {
+        fetch('http://localhost:5000/get_memories')
+            .then((res) => res.json())
+            .then((data) => {
+                setMemories(data)
+                setLoading(false)
+            })
+    }, [])
+
+    const ImageColumn = () => {
         return (
-            <div className="bg-pink-600 flex flex-col justify-center m-6 p-3 w-[250px]">
-                <div className="w-full aspect-square bg-black"></div>
-                <p>{title}</p>
-                <p className="">{date}</p>
+            <div className="flex flex-col">
+                
             </div>
         )
     }
 
-    for (let i = 0; i < numMemories; i++) {
-        memoryElements.push(<MemoryElement title={`${i}`} date={`${i}`} pictures={`${i}`} />)
-    }
-
     return (
-        <div className="flex flex-col items-center">
-        </div>
+        <main className='flex flex-col'>
+            <MainHeader />
+            <div>
+                <p></p>
+            </div>
+            <div className="flex flex-row">
+                <ImageColumn />
+                <ImageColumn />
+            </div>
+        </main>
     )
 }

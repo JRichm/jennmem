@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from model import connect_to_db
 from datetime import datetime
-from crud import create_user, create_memory, create_picture, get_user_by_email, get_user_by_username
+from crud import create_user, create_memory, create_picture, get_user_by_email, get_user_by_username, get_all_memories
 
 
 app = Flask(__name__)
@@ -43,6 +43,11 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
+
+@app.route('/get_memories', methods=['GET'])
+def get_memories():
+    memories = get_all_memories()
+    return jsonify(memories)
 
 if __name__ == '__main__':
     connect_to_db(app)
