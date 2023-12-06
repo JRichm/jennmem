@@ -7,7 +7,7 @@ from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from model import connect_to_db, db
 from datetime import datetime
-from crud import create_user, create_memory, create_picture, get_user_by_email, get_user_by_username, get_all_memories
+from crud import create_user, create_memory, create_picture, get_user_by_email, get_user_by_username, get_all_memories, get_pictures_from_memory_id
 
 load_dotenv()
 
@@ -74,7 +74,7 @@ def add_picture():
     picture_data = request.files.get('imageData')
 
     # Define the path to save the image
-    upload_folder = 'savedPictures'  # Replace with your actual path
+    upload_folder = 'public/savedPictures'  # Replace with your actual path
     if not os.path.exists(upload_folder):
         os.makedirs(upload_folder)
 
@@ -89,6 +89,24 @@ def add_picture():
 
     return jsonify({"Success": new_picture.id, "message": "Picture saved successfully"})
     
+
+@app.route('/get_mem_pics/<memory_id>', methods=['GET'])
+def get_mem_pics(memory_id):
+    pictures = get_pictures_from_memory_id(memory_id)
+
+    if pictures is None:
+        # Memory not found, return a JSON response with a 404 status code
+        abort(404)
+
+    # Check if it's a Flask Response object
+    if isinstance(pictures, Flask.response_class):
+        # Extract the JSON data from the Response object
+        pictures_json = json.loads(pictures.get_data(as_text=True))
+    else:
+        # If it's not a Response object, use it as is
+        pictures_json = pictures
+
+    return jsonify(pictures_json)
 
 @app.route('/get_memories', methods=['GET'])
 def get_memories():

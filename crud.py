@@ -39,3 +39,16 @@ def get_all_memories():
         for memory in memories
     ]
     return jsonify(memories_list)
+
+def get_pictures_from_memory_id(memory_id):
+    pictures = Picture.query.filter(Picture.memory_id == memory_id)
+    picture_list = [
+        {
+            "id": picture.id,
+            "data": picture.data,
+            "created": picture.created.strftime("%Y-%m-%d %H:%M:%S"),
+            "updated": picture.updated.strftime("%Y-%m-%d %H:%M:%S")
+        }
+        for picture in pictures
+    ]
+    return jsonify(picture_list)
