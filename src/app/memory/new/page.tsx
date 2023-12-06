@@ -12,36 +12,85 @@ export default function NewMemoryPage() {
         memoryDate: Date;
         memoryDetails: string;
     }
+    
+    const [uploadedImages, setUploadedImages] = useState<string[]>([])  // array of images uploaded so far
+    const [uploadedImageDate, setUploadedImageDate] = useState("")      // suggested date when user uploads pictures with attached date
+    const [formData, setFormData] = useState<formDataType>({memoryName: "", memoryDate: new Date(), memoryDetails: ""}) // form data / user input
 
-    const [uploadedImages, setUploadedImages] = useState<string[]>([])
-    const [uploadedImageDate, setUploadedImageDate] = useState("")
-    const [formData, setFormData] = useState<formDataType>({memoryName: "", memoryDate: new Date(), memoryDetails: ""})
+    // save images
+    function saveImages(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault()
+        console.log('saving images')
+        console.log(uploadedImages)
 
+        uploadedImages.forEach(image => {
+            let imgData = getBase64Image(image)
+            localStorage.setItem("/images/imgDta", imgData)
+        })
+    }
+
+    // handle user input 
     function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+
+        // get values from changed input
         const { name, value } = e.target;
 
+        // update formData with new input        
         setFormData((prevData) => ({
             ...prevData,
             [name]: value,
         }));
-
-        console.log('updated formdata', name, value)
     }
-
-    async function getImageFromInput(event: React.ChangeEvent<HTMLInputElement>) {
-        const fileList = event.target.files;
     
+    // handle image upload
+    async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement & { target: { files: FileList } }>) {
+
+        // get file(s) from file input
+        const fileList = event.target.files;
         if (!fileList) return;
     
+        // convert list to array
         const imagesArray = Array.from(fileList);
     
+        // loop through file(s)
         for (const imageFile of imagesArray) {
+
+            // get url from image
             const dataURL = await readFileAsync(imageFile);
+
+            // Assuming you have an API endpoint to handle file uploads
+            uploadImageToServer(imageFile)
+                .then((serverImagePath) => {
+                    // Save the server image path to localStorage
+                    localStorage.setItem("serverImagePath", serverImagePath);
+                })
+                .catch((error) => {
+                    console.error("Error uploading image:", error);
+                });
+        }
+
+            // add url to list of all uploaded images
             setUploadedImages((prevImages) => [...prevImages, dataURL]);
-            await processExifData(imageFile);
         }
     }
+
+    function uploadImageToServer(imageFile) {
+
+    }
+
+    function getBase64Image(img: HTMLImageElement) {
+        var canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
     
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+    
+        var dataURL = canvas.toDataURL("image/png");
+    
+        return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+    }
+
     async function readFileAsync(file: File): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
@@ -52,45 +101,20 @@ export default function NewMemoryPage() {
             reader.readAsDataURL(file);
         });
     }
-    
-    async function processExifData(imageFile: File): Promise<string> {
-        console.log('imageFile');
-        console.log(imageFile);
-    
-        const dataURL = await readFileAsync(imageFile);
-    
-        return new Promise<string>((resolve, reject) => {
-            exif.getData(dataURL, () => {
-                const dateOriginal = exif.getTag(imageFile, 'DateTimeOriginal');
-                const lastModifiedDate = new Date(imageFile.lastModified);
-    
-                if (dateOriginal) {
-                    console.log('Date from EXIF:', dateOriginal);
-                    resolve(dateOriginal);
-                } else if (lastModifiedDate) {
-                    console.log('Date from lastModifiedDate:', lastModifiedDate.toISOString());
-                    resolve(lastModifiedDate.toISOString());
-                } else {
-                    console.log('No date found from EXIF');
-                    resolve("");
-                }
-            });
-        });
-    }
 
     const AttachedImages = () => {
         const numImages = uploadedImages.length;
         const numCols = 4;
-        let numRows = Math.ceil(numImages / numCols); // Use Math.ceil to ensure correct numRows
+        let numRows = Math.ceil(numImages / numCols);
+        if (numRows == 0) numRows = 1
        
         let elements = [];
-        if (numRows == 0) numRows = 1
 
         for (let i = 0; i < numRows * numCols; i++) {
             elements.push(
                 <div key={i} className='flex aspect-square'>
                     { i < numImages ? (
-                        <div className='bg-black h-full w-full'>
+                        <div className='h-full w-full'>
                             <img src={uploadedImages[i]} alt={`uploaded-${i}`} className='h-full w-full object-cover' />
                         </div>
                     ) : (
@@ -115,7 +139,7 @@ export default function NewMemoryPage() {
             <div className="flex flex-col items-center">
                 <div className='bg-gray-100 flex flex-col items-center p-6'>
                     <h1 className='text-xl m-3 tracking-[5px] font-medium'>New Memory...</h1>
-                    <form className="flex flex-col gap-2 w-[500px]">
+                    <form className="flex flex-col gap-2 w-[500px]" onSubmit={saveImages}>
                         <label className='mb-[-7px] mt-3' htmlFor="memoryName">Name of memory</label>
                         <input type="text" name="memoryName" className='p-1' onChange={handleInputChange}></input>
                         <label className='mb-[-7px] mt-3' htmlFor="memoryDate">Memory date</label>
@@ -133,7 +157,7 @@ export default function NewMemoryPage() {
                         <label htmlFor="memoryImages" className='mb-[-7px] mt-3'>Pictures</label>
                         <AttachedImages />
                         <div className='mb-[-7px] mt-3'>
-                            <input type="file" accept="image/*" onChange={getImageFromInput}></input>
+                            <input type="file" accept="image/*" onChange={handleImageUpload}></input>
                         </div>
                         <span className='flex flex-row justify-end gap-4 mt-4'>
                             <input type="submit" value={"cancel"} className='bg-red-500 px-8 py-1 rounded-lg text-white font-medium self-end hover:cursor-pointer hover:bg-red-700 transition-all'></input>

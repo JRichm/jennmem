@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "exif-js": "^2.3.0",
+    "exif-parser": "^0.1.12",
     "next": "14.0.3",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "ts-exif-parser": "^0.2.2"
   },
   "devDependencies": {
     "@types/node": "^20",
