@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 
 import MainHeader from "@/app/components/mainHeader";
+import { METHODS } from 'http';
 
 export default function NewMemoryPage() {
 
@@ -62,8 +63,23 @@ export default function NewMemoryPage() {
         });
     }
 
-    function saveImages() {
-        
+    function saveMemory(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+        console.log('saving memory')
+
+        try {
+            fetch('http://localhost:5000/new_memory', {
+                method: "POST",
+                mode: "cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                // redirect: "follow",
+                body: JSON.stringify(formData)
+            }).then((data) => { console.log(data)})
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     const AttachedImages = () => {
@@ -111,7 +127,7 @@ export default function NewMemoryPage() {
             <div className="flex flex-col items-center">
                 <div className='bg-gray-100 flex flex-col items-center p-6'>
                     <h1 className='text-xl m-3 tracking-[5px] font-medium'>New Memory...</h1>
-                    <form className="flex flex-col gap-2 w-[500px]" onSubmit={saveImages}>
+                    <form className="flex flex-col gap-2 w-[500px]" onSubmit={saveMemory}>
                         <label className='mb-[-7px] mt-3' htmlFor="memoryName">Name of memory</label>
                         <input type="text" name="memoryName" className='p-1' onChange={handleInputChange}></input>
                         <label className='mb-[-7px] mt-3' htmlFor="memoryDate">Memory date</label>

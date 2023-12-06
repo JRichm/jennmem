@@ -1,3 +1,4 @@
+import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -43,11 +44,31 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
+@app.route('/new_memory', methods=['GET','POST'])
+def new_memory():
+    data = request.json
+    memoryName = data.get('memoryName')
+    memoryDate = data.get('memoryDate')
+    memoryDetails = data.get('memoryDetails')
+
+    print('Creating memory:', memoryName, memoryDate, memoryDetails)
+
+    memory = create_memory(memoryName, memoryDate, memoryDetails)
+    return jsonify({"message": "Memory created successfully"})
 
 @app.route('/get_memories', methods=['GET'])
 def get_memories():
     memories = get_all_memories()
-    return jsonify(memories)
+    
+    # Check if it's a Flask Response object
+    if isinstance(memories, Flask.response_class):
+        # Extract the JSON data from the Response object
+        memories_json = json.loads(memories.get_data(as_text=True))
+    else:
+        # If it's not a Response object, use it as is
+        memories_json = memories
+
+    return jsonify(memories_json)
 
 if __name__ == '__main__':
     connect_to_db(app)
