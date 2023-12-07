@@ -7,7 +7,7 @@ from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from model import connect_to_db, db
 from datetime import datetime
-from crud import create_user, create_memory, create_picture, get_user_by_email, get_user_by_username, get_all_memories, get_pictures_from_memory_id
+from crud import create_user, create_memory, create_picture, get_user_by_email, get_user_by_username, get_all_memories, get_pictures_from_memory_id, get_memory_by_id
 
 load_dotenv()
 
@@ -89,6 +89,11 @@ def add_picture():
 
     return jsonify({"Success": new_picture.id, "message": "Picture saved successfully"})
     
+
+@app.route('/memory/<id>', methods=['GET'])
+def get_memory(id):
+    memory = get_memory_by_id(id)
+    return memory
 
 @app.route('/get_mem_pics/<memory_id>', methods=['GET'])
 def get_mem_pics(memory_id):

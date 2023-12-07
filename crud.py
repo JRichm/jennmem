@@ -25,6 +25,24 @@ def get_user_by_email():
 def get_user_by_username():
     pass
 
+def get_memory_by_id(id):
+    memory = Memory.query.filter(Memory.id == id).first()
+    if memory is None:
+        # Assuming query_memory_by_id returns None if memory is not found
+        return jsonify({"error": "Memory not found"}), 404
+
+    # Convert memory object to a dictionary before jsonify
+    memory_dict = {
+        "id": memory.id,
+        "name": memory.name,
+        "date": memory.date,
+        "created": memory.created,
+        "updated": memory.updated,
+        # Add other fields as needed
+    }
+
+    return jsonify(memory_dict)
+
 def get_all_memories():
     memories = Memory.query
     memories_list = [

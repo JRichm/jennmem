@@ -188,7 +188,7 @@ export default function NewMemoryPage() {
                             <input type="file" accept="image/*" onChange={handleImageUpload}></input>
                         </div>
                         <span className='flex flex-row justify-end gap-4 mt-4'>
-                            <input type="submit" value={"cancel"} className='bg-red-500 px-8 py-1 rounded-lg text-white font-medium self-end hover:cursor-pointer hover:bg-red-700 transition-all'></input>
+                            <input type="button" value={"cancel"} className='bg-red-500 px-8 py-1 rounded-lg text-white font-medium self-end hover:cursor-pointer hover:bg-red-700 transition-all' onClick={e => window.location.href = '/memories'}></input>
                             <input type="submit" value={"add"} className='bg-green-500 px-8 py-1 rounded-lg text-white font-medium self-end hover:cursor-pointer hover:bg-blue-700 transition-all'></input>
                         </span>
                     </form>
