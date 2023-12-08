@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev2": " rpm-rul-all --parallel start-backend start-frontend",
+    "start-backend": "python server.py",
+    "start-frontend": "npm run dev",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
